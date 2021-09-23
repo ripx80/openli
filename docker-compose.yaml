@@ -1,0 +1,25 @@
+version: "3.9"
+services:
+  openli-collector:
+    image: "ripx80/openlicollector"
+    container_name: openlicollector
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile-Collector
+    networks:
+      - internal
+    volumes:
+       - ./configs:/etc/openli/
+  openli-provisioner:
+    image: "ripx80/openliprovisioner"
+    container_name: openliprovisioner
+    build:
+      context: ./
+      dockerfile: ./docker/Dockerfile-Provisioner
+    networks:
+      - internal
+    volumes:
+       - ./configs:/etc/openli/
+
+networks:
+  internal:

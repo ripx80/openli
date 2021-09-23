@@ -1,0 +1,12 @@
+ARG VERSION=1
+FROM ripx80/openli:latest
+
+ARG VERSION
+
+LABEL org.opencontainers.image.authors="ripx80@nomail"
+LABEL tag="openliprovisioner"
+
+RUN mkdir -p /etc/openli/ && >/etc/openli/running-intercept-config.yaml
+ENTRYPOINT ["openliprovisioner", "-c", "/etc/openli/provisioner.yaml"]]
+#docker build -t ripx80/openliprovisioner -f Dockerfile-Provisioner .
+#docker run -it --rm --net=host -v "$(pwd)/configs/provisioner.yaml:/etc/openli/provisioner.yaml" ripx80/openliprovisioner

@@ -1,0 +1,11 @@
+ARG VERSION=1
+FROM ripx80/openli:latest
+
+ARG VERSION
+
+LABEL org.opencontainers.image.authors="ripx80@nomail"
+LABEL tag="openlicollector"
+
+ENTRYPOINT ["openlicollector", "-c", "/etc/openli/collector.yaml"]
+#docker build -t ripx80/openlicollector -f Dockerfile-Collector .
+#docker run -it --rm --net=host -v "$(pwd)/configs/collector.yaml:/collector.yaml" ripx80/openlicollector -c /collector.yaml

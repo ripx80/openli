@@ -1,0 +1,80 @@
+# Example configuration file for an OpenLI mediator
+
+# Unique ID string for my network (16 chars max)
+operatorid: OpenLIExample
+
+# Alternative ID string for my network that is used in special HI1 Operations
+# messages (which is 5 chars max).
+altoperatorid: 19811
+
+# Set a unique ID for this mediator (between 1 and 1,000,000)
+mediatorid: 6001
+
+# Connect to a provisioner that is listening on 10.0.0.1:12001
+provisioneraddr: 10.0.0.1
+provisionerport: 12001
+
+# Listen for collectors on 10.200.5.100:8888
+listenaddr: 10.200.5.100
+listenport: 8888
+
+# Write any pcap trace files out to this directory. Only applies to
+# intercepts that are configured to use the pcap output mode.
+pcapdirectory: /traces/openlipcaps/
+
+# Rotate pcap trace files every 30 minutes. This will close any open trace
+# files, flush any remaining output, append the gzip trailers and ensure that
+# the rotated file is ready for processing.
+# Note that the rotation period is aligned to the epoch, so if you start
+# OpenLI at 10:58am, the first rotation will occur at 11:00am, followed by
+# one at 11:30am etc.
+pcaprotatefreq: 30
+
+# This option specifies how any pcap trace files should be named, using a
+# format template much like those used by the C strftime() function.
+# All formatting tokens supported by strftime() are also supported here,
+# with the addition of '%L' which will be substituted with the intercept's
+# LIID and '%s' which will be substituted with the Unix timestamp when the
+# file was created.
+# If not specified, the default template of 'openli_%L_%s' will be used.
+# Note the ".pcap.gz" will be appended to any compressed pcap files, and
+# ".pcap" will be appended to any uncompressed pcap files.
+pcapfilename: example-%L-%d%m%y-%H%M%S
+
+# Set the gzip compression level to be applied when writing pcap files.
+# If set to zero, then files will not be compressed. The default value is
+# 1. and cannot be set higher than 9. Higher compression levels will require
+# significantly more CPU to compress, so we do not recommend using values
+# higher than 1 without a very good reason.
+pcapcompress: 1
+
+# If you wish to encrypt your internal OpenLI communications between
+# components, these three options must be point to valid certificates / keys
+# to be used for TLS encryption. Make sure that if you enable TLS on
+# one OpenLI component, that you also do so on all of the others.
+#
+# Leave these commented out for unencrypted inter-component communications.
+# Note that if you wish you use SSL authentication for RabbitMQ (see below),
+# then you will need to provide these options regardless (and therefore will
+# have to accept encrypted inter-component communication).
+#
+#tlscert: /etc/openli/openli-mediator-crt.pem
+#tlskey: /etc/openli/openli-mediator-key.pem
+#tlsca: /etc/openli/openli-ca-crt.pem
+
+# To receive records from collectors that are using RabbitMQ to persist
+# unacknowledged data, you will need to provide the credentials necessary
+# for the mediator to authenticate against the RabbitMQ server running on the
+# collectors.
+RMQenabled: false               # set to true to enable RabbitMQ sessions
+RMQname: "rmquser"
+RMQpass: "rmqpassword"          # not required if using SSL auth
+RMQSSL: true                    # set to false to use plain auth instead
+RMQheartbeatfreq: 30            # time between heartbeats in seconds
+
+# If set to 'no', intercepted packets streamed to this mediator by the
+# collectors will be treated as unencrypted -- this may be desirable for
+# performance reasons. Make sure you set the corresponding option on the
+# collectors as well.
+#etsitls: yes
+

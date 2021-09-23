@@ -1,0 +1,113 @@
+# Example configuration file for an OpenLI collector
+
+# Connect to a provisioner that is listening on 10.0.0.1:9001
+provisioneraddr: 10.0.0.1
+provisionerport: 9001
+
+# Unique ID string for my network (16 chars max)
+operatorid: WAND
+
+# Unique ID string for the location of my collector (16 chars max)
+networkelementid: OpenLIdevlab
+
+# Unique ID string for this collector, just in case I have more than one
+# at this location. Optional if I only have one collector at this location
+# (8 chars max)
+interceptpointid: test01
+
+# Number of threads to use to track sequence numbers for each intercept.
+# You probably don't need to change this.
+seqtrackerthreads: 1
+
+# Number of threads to use to encode intercepted packets as ETSI records.
+# Increasing this number *may* improve performance if encoding is a
+# bottleneck for your collector deployment.
+encoderthreads: 2
+
+# Number of threads to use to forward encoded ETSI records to the
+# mediators. You probably don't need to change this.
+forwardingthreads: 1
+
+# Set this to yes if you want to override the policy of not trusting the
+# contents of the "From:" field in SIP packets (as this field is not
+# validated and can be easily spoofed).
+sipallowfromident: no
+
+# Number of minutes between each dump of performance statistics to the
+# logger. Set to zero to disable this extra logging altogether.
+logstatfrequency: 5
+
+# List of ALU LI mirrors that we are acting as a translation module for.
+# NOTE: This should be the IP and port of the *recipient* of the ALU
+#       intercept mirror, not the host that is doing the mirroring.
+# NOTE: ALU LI translation is a special case that won't apply to most users,
+#       but the configuration is included here for completeness
+#alumirrors:
+# - ip: 10.100.0.233
+#   port: 8500
+
+
+# If you wish to encrypt your internal OpenLI communications between
+# components, these three options must be point to valid certificates / keys
+# to be used for TLS encryption. Make sure that if you enable TLS on
+# one OpenLI component, that you also do so on all of the others.
+#
+# Leave these commented out for unencrypted inter-component communications.
+#tlscert: /etc/openli/openli-collector-crt.pem
+#tlskey: /etc/openli/openli-collector-key.pem
+#tlsca: /etc/openli/openli-ca-crt.pem
+
+# If set to 'no', intercepted packets streamed by this collector to the
+# mediator will not be encrypted -- this may be desirable for performance
+# reasons. Make sure you set the corresponding option on the mediator as
+# well.
+#etsitls: yes
+
+# If set to 'yes', SIP packets with the same identifiers in the SDP O field
+# will *not* be assumed to be different legs of the same SIP call. Some
+# VOIP implementations do not generate sufficiently unique O fields for
+# each call and therefore, for those implementations, the SDP O data needs to
+# ignored to prevent OpenLI from erroneously including extra SIP traffic in a
+# VOIP intercept.
+# Defaults to 'no', because SDP O fields *should* be unique and this is
+# clearly stated in the ETSI LI spec that O fields are meant to be used
+# in this way to group call legs.
+# sipignoresdpo: no
+
+# List of Juniper mirrors that we are acting as a mediator for.
+# NOTE: This should be the IP and port of the *recipient* of the mirrored
+#       traffic, not the host that is doing the mirroring.
+# NOTE: JMirror translation is a special case that only applies to Juniper
+#       networks, but the configuration is included here for completeness
+jmirrors:
+ - ip: 192.168.200.77
+   port: 30030
+
+
+# If set to true, then the collector will use RabbitMQ to buffer encoded
+# ETSI records to be forwarded to the mediators. The buffered packets will
+# be persisted to disk and therefore will still be available if the collector
+# process terminates.
+# If set to false, then the collector will buffer the records in memory
+# instead. Buffered packets will be lost if the collector is restarted, and
+# your buffer capacity will be limited by the amount of RAM you have spare.
+RMQenabled: false
+
+# The username to use when authenticating against a local RabbitMQ instance
+RMQname: "rmquser"
+
+# The password to use when authenticating against a local RabbitMQ instance
+RMQpass: "rmqpassword"
+
+# List of interfaces to capture packets on
+inputs:
+ - uri: eth0            # capture on interface eth1
+   threads: 2           # use 2 processing threads for this input
+
+# - uri: eth2            # capture on interface eth2
+#   threads: 2           # use 2 processing threads for this input
+#   hasher: radius       # hash packets based on RADIUS session
+
+# - uri: dpdk:0000:42:00.0     # capture on DPDK interface with this PCI address
+#   threads: 4                 # use 4 processing threads for this input
+#   hasher: bidirectional      # hash based on bidirectional flow 5-tuple
